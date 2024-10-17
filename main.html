@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa con Neblina</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 100vh;
+        }
+        .fog {
+            background: rgba(0, 0, 0, 0.7);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<!-- Leaflet.js -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<!-- Leaflet Locate Control -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-locatecontrol/0.73.0/L.Control.Locate.min.js"></script>
+
+<script>
+    // Crear el mapa
+    const map = L.map('map').setView([0, 0], 2); // Inicialización en vista global
+    
+    // Añadir una capa base (OpenStreetMap)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Añadir la neblina (una capa de neblina negra)
+    const fogLayer = L.rectangle([[-90, -180], [90, 180]], {
+        color: "#000000",
+        fillColor: "#000000",
+        fillOpacity: 0.7,
+        interactive: false
+    }).addTo(map);
+
+    // Función para despejar neblina alrededor del usuario
+    function clearFog(latlng, radius = 200) {
+        const fogFreeCircle = L.circle(latlng, { radius, color: 'transparent', fillColor: 'transparent', interactive: false });
+        fogLayer.subtract(fogFreeCircle);
+    }
+
+    // Añadir control de geolocalización
+    const locateControl = L.control.locate({
+        flyTo: true,
+        watch: true,  // Seguir los movimientos del usuario
+        setView: true,
+        keepCurrentZoomLevel: true,
+        onLocationError: function(e) {
+            alert(e.message);
+        },
+        onLocationFound: function(e) {
+            clearFog(e.latlng, 300);  // Despejar la neblina alrededor del usuario
+        }
+    }).addTo(map);
+
+    locateControl.start(); // Comenzar a detectar la ubicación del usuario
+</script>
+
+</body>
+</html>
