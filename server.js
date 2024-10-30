@@ -2,17 +2,23 @@
 const express = require('express');
 const mysql = require('mysql2'); // Para MySQL o MariaDB
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
-app.use(cors()); // Permite solicitudes de diferentes dominios
-app.use(express.json()); // Permite recibir datos en formato JSON
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Conexión a la base de datos
 const db = mysql.createConnection({
     host: 'localhost', // Cambia esto a tu host de DB
     user: 'root',
-    password: 'Diego',
+    password: 'gerardojr0809',
     database: 'MED_db',
+});
+
+app.get('/api/map', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'main.html'));
 });
 
 db.connect((err) => {
